@@ -1,13 +1,13 @@
 docker_network: app-network
 
-db_container: database
-db_image: <dockerhub_user>/tp-devops-database:latest
+db_container: postgres_container
+db_image: iliesn/tp-database:latest
 db_name: db
 db_user: usr
 db_password: pwd
 
 app_container: simple-api
-app_image: <dockerhub_user>/tp-devops-simple-api:latest
+app_image: iliesn/tp-backend:latest
 
-proxy_container: httpd
-proxy_image: <dockerhub_user>/tp-devops-httpd:latest
+proxy_container: http_server
+proxy_image: iliesn/tp-httpd:latest

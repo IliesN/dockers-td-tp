@@ -1,3 +1,13 @@
-#SPDX-License-Identifier: MIT-0
 ---
-# tasks file for roles/app
+- name: Run backend API
+  community.docker.docker_container:
+    name: "{{ app_container }}"
+    image: "{{ app_image }}"
+    pull: true
+    restart_policy: unless-stopped
+    env:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://{{ db_container }}:5432/{{ db_name }}"
+      SPRING_DATASOURCE_USERNAME: "{{ db_user }}"
+      SPRING_DATASOURCE_PASSWORD: "{{ db_password }}"
+    networks:
+      - name: "{{ docker_network }}"

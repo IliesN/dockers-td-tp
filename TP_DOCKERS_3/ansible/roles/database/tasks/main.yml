@@ -1,3 +1,15 @@
-#SPDX-License-Identifier: MIT-0
 ---
-# tasks file for roles/database
+- name: Run database
+  community.docker.docker_container:
+    name: "{{ db_container }}"
+    image: "{{ db_image }}"
+    pull: true
+    restart_policy: unless-stopped
+    env:
+      POSTGRES_DB: "{{ db_name }}"
+      POSTGRES_USER: "{{ db_user }}"
+      POSTGRES_PASSWORD: "{{ db_password }}"
+    networks:
+      - name: "{{ docker_network }}"
+    volumes:
+      - postgresvolume:/var/lib/postgresql/data

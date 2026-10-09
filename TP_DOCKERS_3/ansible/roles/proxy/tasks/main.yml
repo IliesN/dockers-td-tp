@@ -1,3 +1,11 @@
-#SPDX-License-Identifier: MIT-0
 ---
-# tasks file for roles/proxy
+- name: Run HTTPD proxy
+  community.docker.docker_container:
+    name: "{{ proxy_container }}"
+    image: "{{ proxy_image }}"
+    pull: true
+    restart_policy: unless-stopped
+    ports:
+      - "80:80"
+    networks:
+      - name: "{{ docker_network }}"
