@@ -1,0 +1,13 @@
+docker_network: app-network
+
+db_container: database
+db_image: <dockerhub_user>/tp-devops-database:latest
+db_name: db
+db_user: usr
+db_password: pwd
+
+app_container: simple-api
+app_image: <dockerhub_user>/tp-devops-simple-api:latest
+
+proxy_container: httpd
+proxy_image: <dockerhub_user>/tp-devops-httpd:latest
