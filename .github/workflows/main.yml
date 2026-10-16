@@ -24,7 +24,7 @@ jobs:
       # Clean, build, and run unit + integration tests
       # (Testcontainers starts a PostgreSQL container for the integration tests)
       - name: Build and test with Maven
-        run: mvn -B clean verify --file backend-api/simpleapi/pom.xml
+        run: mvn -B clean verify --file TP_DOCKERS_1/backend-api/simpleapi/pom.xml
   build-and-push-docker-image:
     # Run only if the backend builds and its tests pass
     needs: test-backend
@@ -41,20 +41,20 @@ jobs:
       - name: Build image and push backend
         uses: docker/build-push-action@v6
         with:
-          context: ./backend-api/simpleapi   # folder containing the Dockerfile
+          context: ./TP_DOCKERS_1/backend-api/simpleapi   # folder containing the Dockerfile
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api:latest
           push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build image and push database
         uses: docker/build-push-action@v6
         with:
-          context: ./database
+          context: ./TP_DOCKERS_1/database
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-database:latest
           push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build image and push httpd
         uses: docker/build-push-action@v6
         with:
-          context: ./http-server
+          context: ./TP_DOCKERS_1/http-server
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
           push: ${{ github.ref == 'refs/heads/main' }}
