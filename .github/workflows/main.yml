@@ -11,8 +11,10 @@ jobs:
   test-backend:
     runs-on: ubuntu-24.04
     steps:
-      # Get the repository code
+      # Get the repository code (full history, needed by SonarCloud)
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # Install Java 21 (the version used by the backend)
       - name: Set up JDK 21
@@ -20,21 +22,22 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+
       # Clean, build, and run unit + integration tests
       # (Testcontainers starts a PostgreSQL container for the integration tests)
       - name: Build and test with Maven
         run: mvn -B clean verify --file TP_DOCKERS_1/backend-api/simpleapi/pom.xml
+
+      # Quality gate: analyse the code and test results on SonarCloud
       - name: SonarCloud analysis
         run: >
           mvn -B verify sonar:sonar
-          -Dsonar.projectKey=<your-project-key>
-          -Dsonar.organization=<your-org>
+          -Dsonar.projectKey=IliesN_dockers-td-tp
+          -Dsonar.organization=iliesn
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.token=${{ secrets.SONAR_TOKEN }}
-          --file backend-api/simpleapi/pom.xml
+          --file TP_DOCKERS_1/backend-api/simpleapi/pom.xml
+
   build-and-push-docker-image:
     # Run only if the backend builds and its tests pass
     needs: test-backend
