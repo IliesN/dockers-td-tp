@@ -25,3 +25,36 @@ jobs:
       # (Testcontainers starts a PostgreSQL container for the integration tests)
       - name: Build and test with Maven
         run: mvn -B clean verify --file backend-api/simpleapi/pom.xml
+  build-and-push-docker-image:
+    # Run only if the backend builds and its tests pass
+    needs: test-backend
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Log in to Docker Hub using the secured variables
+      - name: Login to DockerHub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      # Build each image; push to Docker Hub only from main
+      - name: Build image and push backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend-api/simpleapi   # folder containing the Dockerfile
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build image and push database
+        uses: docker/build-push-action@v6
+        with:
+          context: ./database
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-database:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build image and push httpd
+        uses: docker/build-push-action@v6
+        with:
+          context: ./http-server
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
