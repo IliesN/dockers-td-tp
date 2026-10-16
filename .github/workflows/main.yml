@@ -31,9 +31,9 @@ jobs:
       # Quality gate: analyse the code and test results on SonarCloud
       - name: SonarCloud analysis
         run: >
-          mvn -B verify sonar:sonar
-          -Dsonar.projectKey=IliesN_dockers-td-tp
-          -Dsonar.organization=iliesn
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+          -Dsonar.projectKey=<your-project-key>
+          -Dsonar.organization=<your-org>
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.token=${{ secrets.SONAR_TOKEN }}
           --file TP_DOCKERS_1/backend-api/simpleapi/pom.xml
