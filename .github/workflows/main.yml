@@ -1,34 +1,24 @@
 name: CI devops 2025
 
 on:
-  # Run the pipeline on every push to main and develop
   push:
-    branches: [main, develop]
-  # ...and on every pull request
-  pull_request:
+    branches: [main]
+*  pull_request:
 
 jobs:
   test-backend:
     runs-on: ubuntu-24.04
     steps:
-      # Get the repository code (full history, needed by SonarCloud)
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      # Install Java 21 (the version used by the backend)
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
-
-      # Clean, build, and run unit + integration tests
-      # (Testcontainers starts a PostgreSQL container for the integration tests)
       - name: Build and test with Maven
         run: mvn -B clean verify --file TP_DOCKERS_1/backend-api/simpleapi/pom.xml
-
-      # Quality gate: analyse the code and test results on SonarCloud
       - name: SonarCloud analysis
         run: >
           mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
@@ -39,22 +29,19 @@ jobs:
           --file TP_DOCKERS_1/backend-api/simpleapi/pom.xml
 
   build-and-push-docker-image:
-    # Run only if the backend builds and its tests pass
     needs: test-backend
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Log in to Docker Hub using the secured variables
       - name: Login to DockerHub
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
-      # Build each image; push to Docker Hub only from main
       - name: Build image and push backend
         uses: docker/build-push-action@v6
         with:
-          context: ./TP_DOCKERS_1/backend-api/simpleapi   # folder containing the Dockerfile
+          context: ./TP_DOCKERS_1/backend-api/simpleapi
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api:latest
           push: ${{ github.ref == 'refs/heads/main' }}
 
