@@ -20,11 +20,21 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       # Clean, build, and run unit + integration tests
       # (Testcontainers starts a PostgreSQL container for the integration tests)
       - name: Build and test with Maven
         run: mvn -B clean verify --file TP_DOCKERS_1/backend-api/simpleapi/pom.xml
+      - name: SonarCloud analysis
+        run: >
+          mvn -B verify sonar:sonar
+          -Dsonar.projectKey=<your-project-key>
+          -Dsonar.organization=<your-org>
+          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+          --file backend-api/simpleapi/pom.xml
   build-and-push-docker-image:
     # Run only if the backend builds and its tests pass
     needs: test-backend
